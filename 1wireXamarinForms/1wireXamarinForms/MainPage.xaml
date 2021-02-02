@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="_1wireXamarinForms.MainPage">
+
+    <StackLayout>
+        <Grid>
+            <Grid.RowDefinitions >
+                <RowDefinition Height="0.2*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button  Grid.Row="0" Text="Refresh" HorizontalOptions="Center"  Clicked="OnRefreshDevicesButtonClicked"/>
+
+
+            <Label Grid.Row="1" Text="{Binding Source={x:Reference Name=devicesList}, Path=SelectedItem.DeviceName}"
+            FontSize="Large" />
+            <ListView Grid.Row="1" x:Name="devicesList"
+              HasUnevenRows="True"
+              ItemsSource="{Binding Devices}"
+              ItemTapped="OnItemTapped">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <StackLayout>
+                                    <Label Text="{Binding DeviceName}" FontSize="18" />
+                                    <Label Text="{Binding Description}" />
+                                </StackLayout>
+                            </ViewCell.View>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <!--<BoxView  Grid.Row="0" Color="Blue"/>
+            <Label  Grid.Row="0" Text="Device List" HorizontalOptions="Center" FontSize="Large" />
+            
+            <BoxView Grid.Row="1"/>
+            <Button  Grid.Row="1" Text="Refresh" HorizontalOptions="Center"  Clicked="OnRefreshButtonClicked"/>
+
+            <Label Grid.Row="2" x:Name="selected" HorizontalOptions="Center" FontSize="Large" />
+            <ListView Grid.Row="2" x:Name="devicesList" ItemsSource="{Binding devices}" ItemTapped="DevicesList_ItemTapped" />-->
+
+        </Grid>
+        
+    </StackLayout>
+
+</ContentPage>
