@@ -1,4 +1,7 @@
-﻿using _1wireXamarinForms.Models;
+﻿using _1wireXamarinForms.DalSemi.OneWire;
+using _1wireXamarinForms.DalSemi.OneWire.Adapter;
+using _1wireXamarinForms.DalSemi.Serial;
+using _1wireXamarinForms.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,7 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using System.IO.Ports;
+using SerialPort = DalSemi.Serial.SerialPort;
+using AccessProvider = DalSemi.OneWire.AccessProvider;
+using PortAdapter = DalSemi.OneWire.Adapter.PortAdapter;
+
+
 namespace _1wireXamarinForms
 {
     public partial class MainPage : ContentPage
@@ -14,6 +21,17 @@ namespace _1wireXamarinForms
         public List<MyDevice> Devices { get; set; }
 
         public SerialPort port;
+        public PortAdapter adapter;
+        public List<string> DeviceNameEvalible = new List<string>(10);
+
+        public MainPage(List<MyDevice> devices)
+        {
+
+            InitializeComponent();
+            Devices = devices;
+            (Application.Current).MainPage = new NavigationPage(new MainPage(Checkport()));
+            this.BindingContext = this;
+        }
         public MainPage()
         {
             InitializeComponent();
@@ -34,42 +52,51 @@ namespace _1wireXamarinForms
                 await DisplayAlert("Выбранная модель", $"{selectedDevice.DeviceName} - {selectedDevice.Description}", "OK");
         }
 
-        public async void OnRefreshDevicesButtonClicked(object sender, EventArgs args)
+        public void OnRefreshDevicesButtonClicked(object sender, EventArgs args)
         {
-            checkport();
-
+            (Application.Current).MainPage = new NavigationPage(new MainPage(Checkport()));
         }
 
-        public async void  checkport()
+        public List<MyDevice> Checkport()
         {
-            port = new SerialPort(port.PortName=SetPortName(port.PortName), 9600, Parity.None, 0, StopBits.One);
+            List<MyDevice> newDeviceList = new List<MyDevice>();
+
+            //List<PortAdapter> portAdapterList =(List<PortAdapter>)AccessProvider.GetAllAdapters();
+            //if (!portAdapterList.Any())
+               // newDeviceList.Add(new MyDevice() { DeviceName = "No Devices Found", Description = "try late" });
+
+            //adapter = portAdapterList.FirstOrDefault();
+
+
+            //if (adapter == null)
+                newDeviceList.Add(new MyDevice() { DeviceName = "No Devices Found", Description = "try late" });
+
+            //DeviceNameEvalible = portAdapterList.Select(x => x.AdapterName).ToList();
+            //try
+            //{
+            //    adapter = AccessProvider.GetAdapter("{DS9490}");
+            //    if (adapter.OpenPort(port.PortName))
+            //        newDeviceList.Add(new MyDevice() { DeviceName = "Serial Port is Open", Description = "YRA!!!DS9490}" });
+            //}
+            //catch
+            //{
+            //    adapter = AccessProvider.GetAdapter("{DS9097U}");
+            //    if (adapter.OpenPort(port.PortName))
+            //        newDeviceList.Add(new MyDevice() { DeviceName = "Serial Port is Open", Description = "YRA!!!{DS9097U}" });
+            //}
 
             port.Open();
 
+            if(port.IsOpen)
+                newDeviceList.Add(new MyDevice() { DeviceName = "Serial Port is Open", Description = "YRA!!!" });
+
+            if (DeviceNameEvalible.Any())
+                for (int i = 0; i < DeviceNameEvalible.Count(); i++)
+                    newDeviceList.Add(new MyDevice() { DeviceName = DeviceNameEvalible[i], Description = $"empty string {i+1} device" });
 
 
+
+            return newDeviceList;
         }
-
-        public static string SetPortName(string defaultPortName)
-        {
-            string portName;
-
-            Console.WriteLine("Available Ports:");
-            foreach (string s in SerialPort.GetPortNames())
-            {
-                Console.WriteLine("   {0}", s);
-            }
-
-            Console.Write("Enter COM port value (Default: {0}): ", defaultPortName);
-            portName = Console.ReadLine();
-
-            if (portName == "" || !(portName.ToLower()).StartsWith("com"))
-            {
-                portName = defaultPortName;
-            }
-            return portName;
-        }
-
-
     }
 }

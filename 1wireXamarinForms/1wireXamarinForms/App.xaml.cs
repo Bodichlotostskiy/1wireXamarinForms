@@ -11,6 +11,8 @@ namespace _1wireXamarinForms
             InitializeComponent();
 
             MainPage = new MainPage();
+
+            (Application.Current).MainPage = new NavigationPage(new Home());
         }
 
         protected override void OnStart()
